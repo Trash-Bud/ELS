@@ -1,0 +1,15 @@
+/bin/
+.gradle/
+/build/
+/.settings/
+/run/
+
+# Class files
+**/*.class
+
+/.idea/*
+!/.idea/runConfigurations
+
+/.vscode/*
+
+out/*

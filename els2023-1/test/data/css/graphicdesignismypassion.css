@@ -1,0 +1,10 @@
+table, th, td {
+    border: 1px solid;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-size: 42px;
+}
+
+body {
+    background-color: deeppink;
+    color: pink;
+}

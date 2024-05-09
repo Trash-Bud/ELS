@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: pt.up.fe.els2023.Dsl
+Bundle-ManifestVersion: 2
+Bundle-Name: pt.up.fe.els2023.Dsl
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: pt.up.fe.els2023.Dsl; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.16.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.14.0",
+ org.eclipse.xtext.util,
+ org.eclipse.emf.common,
+ org.antlr.runtime;bundle-version="[3.2.0,3.2.1)"
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Export-Package: pt.up.fe.els2023.services,
+ pt.up.fe.els2023.validation,
+ pt.up.fe.els2023.dsl,
+ pt.up.fe.els2023.dsl.impl,
+ pt.up.fe.els2023.dsl.util,
+ pt.up.fe.els2023.parser.antlr.internal,
+ pt.up.fe.els2023.scoping,
+ pt.up.fe.els2023.parser.antlr,
+ pt.up.fe.els2023.generator,
+ pt.up.fe.els2023,
+ pt.up.fe.els2023.serializer
+Import-Package: org.apache.log4j

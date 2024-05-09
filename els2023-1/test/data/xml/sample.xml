@@ -1,0 +1,21 @@
+<root>
+    <a>
+        <b>
+            <c1>test1</c1>
+            <c2>test2</c2>
+            <c3>test3</c3>
+        </b>
+    </a>
+    <array>
+        <v>1</v>
+        <v>2</v>
+        <v>3</v>
+        <x>
+            <y>A</y>
+            <z>B</z>
+        </x>
+    </array>
+    <f>6</f>
+    <g>7</g>
+    <h>8</h>
+</root>

@@ -1,0 +1,101 @@
+{
+    "sources": {
+        "decision_tree_root": {
+            "path": "test/data/assignment2/decision_tree.yaml",
+            "store_in_columns": { "path": "Folder" }
+        },
+        "decision_tree_params": {
+            "path": "test/data/assignment2/decision_tree.yaml",
+            "format": "yaml",
+            "query": "params"
+        },
+        "vitis-report": {
+            "path": "test/data/assignment2/vitis-report.xml",
+            "format": "xml",
+            "xpathQuery": "/profile/AreaEstimates/Resources"
+        },
+        "profiling": {
+            "path": "test/data/assignment2/profiling.json",
+            "format": "json",
+            "query": "functions"
+        }
+    },
+    "pipelines": {
+        "get_folder_name": [
+            {
+                "transformation": "append_path",
+                "column": "Folder",
+                "value": ".."
+            },
+            {
+                "transformation": "canonicalize_path",
+                "column": "Folder"
+            },
+            {
+                "transformation": "get_name_from_path",
+                "column": "Folder"
+            }
+        ]
+    },
+    "tables": {
+        "decision_tree_root": {
+            "operation": "pipeline",
+            "pipeline": "get_folder_name",
+            "table": {
+                "operation": "selection",
+                "source": "decision_tree_root"
+            }
+        },
+        "decision_tree_params": {
+            "operation": "selection",
+            "source": "decision_tree_params"
+        },
+        "vitis-report": {
+            "operation": "selection",
+            "source": "vitis-report"
+        },
+        "profiling": {
+            "operation": "transformation",
+            "transformation": {
+                "transformation": "select_column",
+                "columns": ["time%", "name"]
+            },
+            "table": {
+                "operation": "transformation",
+                "transformation": {
+                    "transformation": "select",
+                    "amount": 1
+                },
+                "table": {
+                    "operation": "transformation",
+                    "transformation": {
+                        "transformation": "sort",
+                        "on_columns": ["time%"],
+                        "ascending": false
+                    },
+                    "table": {
+                        "operation": "selection",
+                        "source": "profiling"
+                    }
+                }
+            }
+        },
+        "output": {
+            "operation": "transformation",
+            "transformation": {
+                "transformation": "select_column",
+                "columns": ["Folder", "max_features_", "meta", "n_classes_", "n_features_", "n_outputs_", "ccp_alpha", "class_weight", "criterion", "max_depth", "max_features", "max_leaf_nodes", "min_impurity_decrease", "min_impurity_split", "min_samples_leaf", "min_samples_split", "min_weight_fraction_leaf", "random_state", "splitter", "DSP48E", "FF", "LUT", "BRAM_18K", "URAM", "time%", "name"]
+            },
+            "table": {
+                "operation": "merge",
+                "tables": ["decision_tree_root", "decision_tree_params", "vitis-report", "profiling"]
+            }
+        }
+    },
+    "outputs": [
+        {
+            "path": "out/output.csv",
+            "table": "output"
+        }
+    ]
+}

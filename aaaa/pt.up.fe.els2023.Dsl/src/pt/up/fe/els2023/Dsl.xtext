@@ -1,0 +1,227 @@
+grammar pt.up.fe.els2023.Dsl with org.eclipse.xtext.common.Terminals
+
+generate dsl "http://www.up.pt/fe/els2023/Dsl"
+
+MyDsl:
+	assignment += Assignment*
+	export += Export*
+;
+
+
+Assignment:
+	name = ID '=' expression=(Pipeline|Source|Table)
+;
+
+
+CombinationOperations:
+	operation = ('merge' | 'append') type = ("union" | "intersection")?  "[" 
+		tableOperation += TableOperations (',' tableOperation+=TableOperations)* (',')?
+	"]"
+;
+
+
+TableOperations:
+	operation = (SourceOperation | CombinationOperations) (transformations += TransformOperation*)
+;
+
+
+SelectSource:
+	name = ID
+;
+
+InlineSource:
+	'('  sourceExpr = Source ')'
+;
+
+SourceOperation:
+	source = (SelectSource | InlineSource )
+;
+
+
+
+
+TransformationTableOperation:
+	'('transformation = Transformation')'
+;
+
+
+SelectPipeline:
+	name = ID
+;
+
+InlinePipeline:
+	'(' pipelineExpr = Pipeline ')'
+;
+
+PipelineTableOperation:
+	pipeline = (SelectPipeline | InlinePipeline)
+;
+
+TransformOperation:
+	'apply' operation += ( TransformationTableOperation | PipelineTableOperation)
+;
+
+
+
+Table:
+	operation = TableOperations
+	";"
+; 
+	
+
+XmlType:
+	{XmlType} 'xml'( '{' 'xpath' '=' path = STRING ',' "}" )?
+;
+
+JsonType:
+		{JsonType} 'json'( '{' 'jsonpath' '=' path = STRING ',' "}" )?
+	
+;
+	
+	
+YamlType:
+		{YamlType} 'yaml'
+;
+
+CsvType:
+		{CsvType} 'csv'
+;
+
+AutoType:
+		{AutoType} 'auto'
+;
+		
+InputType:
+	JsonType | XmlType | CsvType | YamlType | AutoType
+;
+	
+
+	
+HtmlType:
+	{HtmlType} 'html' ('{''css' '=' cssPath = STRING (',')? '}')?
+;
+	
+OutputType:
+	type = (HtmlType | AutoType | CsvType )
+;
+	
+MetaData:
+	metadata = ('filepath' | 'lastmodified')
+;
+
+
+SourceStore:
+	'store' metadata=MetaData 'in' column = STRING
+;
+SourceCoumnSelect:
+	'select' '[' column += STRING (',' column += STRING)* (',')? ']'
+;
+
+Source:
+	'import' (query=STRING)? 'from' filePath=STRING ('as' inputType=InputType)?
+	store += SourceStore*
+	select = (SourceCoumnSelect)?
+	';'
+;
+	
+CanonicalizePathTransformation:
+	{CanonicalizePathTransformation} 'canonicalize' 'path'
+;
+
+GetPathTransformation:
+	{GetPathTransformation} 'name' 'of' 'path'
+;
+
+	
+AppendPathTransformation:
+	'append' 'path' path = STRING
+;
+
+PathTransformation:
+	operation = (AppendPathTransformation | CanonicalizePathTransformation | GetPathTransformation) 'in' column = STRING
+;
+
+FoldAverageTranformation:
+	{FoldAverageTranformation} 'fold' 'average'
+;
+
+FoldSumTranformation:
+	{FoldSumTranformation} 'fold' 'sum'
+;
+
+
+GroupBy:
+	'group' 'by' column = STRING
+;
+
+
+
+FoldTransformation:
+	operation = (FoldSumTranformation | FoldAverageTranformation) groupBy = GroupBy?
+;
+
+AddColumnTransformation:
+	'add' column = STRING 'with' value = STRING
+;
+
+RemoveColumnTransformation:
+	'remove' '[' column += STRING (',' column += STRING)* (',')? ']'
+;
+
+RenameColumnTransformation:
+	'rename' (regex = 'regex')? from = STRING 'to' to = STRING
+;
+
+SelectColumnTransformation:
+	'select' '[' column += STRING (',' column += STRING)* (',')? ']'
+;
+
+ColumnTransformation:
+	(AddColumnTransformation | RemoveColumnTransformation | RenameColumnTransformation | SelectColumnTransformation)
+;
+
+RoundCellsTransformation:
+	'round' '[' columns += STRING (',' (columns += STRING))* (',')? ']' 'digits' digits = INT
+;
+
+
+SetCellsTransformation:
+	'set''value' value = STRING 'at' 'column' column= STRING ('at' 'row' row=STRING)?
+;
+
+CellTransformation:
+	RoundCellsTransformation | SetCellsTransformation
+;
+
+
+SelectRowsTransformation:
+	
+	'select' start = INT ('skip' length = INT)? ('groupby' groupBy= STRING)?
+;
+
+SortRowsTransformation:
+	'sort' 'by' '[' columns += STRING (',' columns += STRING)* (',')? ']' (order = ('descending' | 'ascending'))?
+;
+
+RowTransformation:
+	SortRowsTransformation | SelectRowsTransformation
+;
+
+
+Transformation:
+	(PathTransformation | FoldTransformation | ColumnTransformation | CellTransformation | RowTransformation)
+;
+	
+	
+Pipeline:
+	'pipe' '['
+		(transformation += Transformation (',' transformation += Transformation )* (',')?)
+	']'';'
+	;
+	
+Export:
+	'export' table=ID 'to' path = STRING 'as' output = OutputType ';'
+		
+;
+
+	

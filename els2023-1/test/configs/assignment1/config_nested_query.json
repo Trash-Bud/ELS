@@ -1,0 +1,25 @@
+{
+    "sources": {
+        "sample": {
+            "path": "test/data/json/sample.json",
+            "format": "json",
+            "query": "nesting.is.arrayful.2",
+            "columns": [
+                "very"
+            ]
+        }
+    },
+    "tables": {
+        "table1": {
+            "operation": "selection",
+            "source": "sample"
+        }
+    },
+    "outputs": [
+        {
+            "path": "out/output.csv",
+            "format": "csv",
+            "table": "table1"
+        }
+    ]
+}

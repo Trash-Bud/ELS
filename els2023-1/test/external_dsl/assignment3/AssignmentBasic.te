@@ -1,0 +1,71 @@
+folderNamePip = pipe [
+    append path ".." at "execution",
+    canonicalize path at "execution",
+    name of path at "execution",
+];
+
+fold1Pip = pipe [
+    select 1 group by "execution",
+    rename "time%" to "% 1",
+    rename "name" to "name 1",
+];
+
+fold2Pip = pipe [
+    select 1 skip 1 group by "execution",
+    rename "time%" to "% 2",
+    rename "name" to "name 2",
+];
+
+fold3Pip = pipe [
+    select 1 skip 2 group by "execution",
+    rename "time%" to "% 3",
+    rename "name" to "name 3",
+];
+
+sumPip = pipe [
+    fold sum,
+    round ["% 1", "% 2", "% 3"] digits 4,
+    set "sum" at "execution",
+];
+
+avgPip = pipe [
+    fold average,
+    round ["% 1", "% 2", "% 3"] digits 4,
+    set "avg" at "execution",
+];
+
+yamlSrc = import "total.results.dynamic"
+    from "test/data/assignment3/*/analysis.yaml" as yaml
+    store filepath in "execution";
+
+xmlSrc = import "root.total.results.static"
+    from "test/data/assignment3/*/analysis.xml" as xml
+    store filepath in "execution";
+
+profilingSrc = import "functions"
+    from "test/data/assignment3/*/profiling.json" as json
+    store filepath in "execution"
+    select ["execution", "time%", "name"];
+
+profilingTable = profilingSrc apply (sort by "time%" descending) apply folderNamePip;
+
+baseTable = merge [
+    profilingTable apply fold1Pip,
+    profilingTable apply fold2Pip,
+    profilingTable apply fold3Pip,
+    yamlSrc apply (rename regex "(?!execution)" to "$0 (Dynamic)") apply folderNamePip,
+    xmlSrc apply (rename regex "(?!execution)" to "$0 (Static)") apply folderNamePip,
+] apply (sort by ["execution"]);
+
+sum1 = baseTable apply sumPip;
+avg = baseTable apply avgPip;
+
+final = append [
+    baseTable,
+    sum1,
+    avg,
+];
+
+export final to "out/output.html" as html {
+    css = "test/data/css/sober.css",
+};

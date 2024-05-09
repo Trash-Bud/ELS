@@ -1,0 +1,26 @@
+{"sources": {
+    "table1": {
+        "path": "test/data/csv/table1.csv",
+        "store_in_columns": { "path": "sanity1" }
+    }
+},
+    "tables": {
+        "output": {
+            "operation": "transformation",
+            "transformation": {
+                "transformation": "fold_average_row",
+                "group_by": "colB"
+            },
+            "table": {
+                "operation": "selection",
+                "source": "table1"
+            }
+        }
+    },
+    "outputs": [
+        {
+            "path": "out/output.html",
+            "table": "output"
+        }
+    ]
+}

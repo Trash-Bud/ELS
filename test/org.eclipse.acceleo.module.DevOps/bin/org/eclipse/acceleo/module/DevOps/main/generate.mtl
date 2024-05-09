@@ -1,0 +1,19 @@
+[comment encoding = UTF-8 /]
+[module generate('http://www.example.org/devOpsPipeline')]
+
+
+[template public generateElement(aSourceRepo : SourceRepo)]
+[comment @main/]
+[file ('index.html', false, 'UTF-8')]
+
+<h1> asdasda </h1>
+
+[for(y:Job | aSourceRepo.job )]
+
+[y.dockerMachine/]
+
+[/for] 
+
+
+[/file]
+[/template]

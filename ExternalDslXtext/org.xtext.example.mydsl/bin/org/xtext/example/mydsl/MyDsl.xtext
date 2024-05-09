@@ -1,0 +1,184 @@
+grammar org.xtext.example.mydsl.MyDsl with org.eclipse.xtext.common.Terminals
+
+generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
+
+MyDsl:
+	pipelines += Pipeline*
+	sources += Source*
+	tables += Table*
+	export += Export*
+;
+
+
+
+CombinationOperations:
+	operation = ('merge' | 'append') type = ("union" | "intersection")?  "[" 
+		tableOperation += TableOperations (',' tableOperation+=TableOperations)* (',')?
+	"]"
+;
+
+
+TableOperations:
+	CombinationOperations | TransformOperation	| SourceOperation
+;
+
+
+SourceOperation:
+	source = ID
+;
+
+
+TransformationTableOperation:
+	'('transformation = Transformation')'
+;
+
+PipelineTableOperation:
+	pipeline = ID
+;
+
+TransformOperation:
+	source = SourceOperation ('transform' operation += ( TransformationTableOperation | PipelineTableOperation))+
+;
+
+
+
+Table:
+	name=ID '=' 
+	operation = TableOperations
+	";"
+; 
+	
+
+XmlType:
+	{XmlType} 'xml'( '{' 'xpath' '=' path = STRING ',' "}" )?
+;
+
+JsonType:
+		{JsonType} 'json'( '{' 'jsonpath' '=' path = STRING ',' "}" )?
+	
+;
+	
+	
+YamlType:
+		{YamlType} 'yaml'
+;
+
+CsvType:
+		{CsvType} 'csv'
+;
+
+AutoType:
+		{AutoType} 'auto'
+;
+		
+InputType:
+	JsonType | XmlType | CsvType | YamlType | AutoType
+;
+	
+
+	
+HtmlType:
+	{HtmlType} 'html' ('{''css' '=' cssPath = STRING '}')?
+;
+	
+OutputType:
+	type = (HtmlType | AutoType | CsvType )
+;
+	
+MetaData:
+	metadata = ('filepath' | 'lastmodified')
+;
+
+
+SourceStore:
+	'store' metadata=MetaData 'in' column = STRING
+;
+SourceCoumnSelect:
+	'selecting' '[' column += STRING (',' column += STRING)* (',')? ']'
+;
+
+Source:
+	name=ID '=' 'import' (query=STRING)? 'from' filePath=STRING ('as' inputType=InputType)?
+	store += SourceStore*
+	select = (SourceCoumnSelect)?
+	';'
+;
+	
+CanonicalizePathTransformation:
+	{CanonicalizePathTransformation} 'canonicalize' 'path'
+;
+
+GetPathTransformation:
+	{GetPathTransformation} 'get' 'path' 'name'
+;
+
+	
+AppendPathTransformation:
+	'append' 'path' path = STRING
+;
+
+PathTransformation:
+	'in' column = STRING operation = (AppendPathTransformation | CanonicalizePathTransformation | GetPathTransformation)
+;
+
+FoldMaxTranformation:
+	'in' column = STRING 'fold' 'max'
+	
+;
+
+FoldAverageTranformation:
+	{FoldAverageTranformation} 'fold' 'avg'
+;
+
+FoldSumTranformation:
+	{FoldSumTranformation} 'fold' 'sum'
+;
+
+
+GroupBy:
+	'group' 'by' column = STRING
+;
+
+
+
+FoldTransformation:
+	operation = (FoldMaxTranformation | FoldSumTranformation | FoldAverageTranformation) groupBy = GroupBy?
+;
+
+AddColumnTransformation:
+	'add' column = STRING 'with' value = STRING
+;
+
+RemoveColumnTransformation:
+	'remove' '[' column += STRING (',' column += STRING)* (',')? ']'
+;
+
+RenameColumnTransformation:
+	'rename' from = STRING 'to' to = STRING
+;
+
+SelectColumnTransformation:
+	'select' '[' column += STRING (',' column += STRING)* (',')? ']'
+;
+
+ColumnTransformation:
+	(AddColumnTransformation | RemoveColumnTransformation | RenameColumnTransformation | SelectColumnTransformation)
+;
+
+Transformation:
+	(PathTransformation | FoldTransformation | ColumnTransformation)
+;
+	
+	
+Pipeline:
+	name=ID '=' 'pipe' '['
+		(transformation += Transformation (',' transformation += Transformation )* (',')?)
+	']'';'
+	;
+	
+Export:
+	'export' table=ID 'to' path = STRING 'as' output = OutputType ';'
+		
+;
+
+	

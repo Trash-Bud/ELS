@@ -1,0 +1,22 @@
+{
+    "nesting": {
+        "is": {
+            "cool": {
+                "ice": "cold",
+                "alright": "alright alright alright"
+            },
+            "arrayful": [
+                "something",
+                "something",
+                {
+                    "very": "deep"
+                }
+            ]
+        }
+    },
+    "data": {
+        "simple": "kiss",
+        "manual": "rtfm",
+        "review": "lgtm"
+    }
+}

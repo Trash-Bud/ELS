@@ -1,0 +1,20 @@
+pip1 = pipe [
+	rename "criterion" to "Criterion",
+	rename "splitter" to "Splitter",
+	rename "ccp_alpha" to "CPP Alpha",
+	rename "min_samples_split" to "Min Samples Split",
+	name of path at "File",
+];
+
+
+report_files = import "params"
+	from "test/data/assignment1" as yaml
+	store filepath in "File"
+	select [
+	    "File", "criterion", "splitter",
+	    "ccp_alpha", "min_samples_split",
+	];
+
+table1 = report_files apply pip1;
+
+export table1 to "out/output.csv";

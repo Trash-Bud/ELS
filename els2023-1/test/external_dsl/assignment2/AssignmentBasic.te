@@ -1,0 +1,35 @@
+pip1 = pipe [
+	sort by "time%" descending,
+	select 1,
+	append path ".." at "folder",
+	canonicalize path at "folder",
+	name of path at "folder",
+];
+
+
+source1 = import "functions" from "test/data/assignment2/profiling.json" as json
+		store filepath in "folder"
+		select [
+		"folder", "time%", "name"
+		];
+
+source2 = import from"test/data/assignment2/vitis-report.xml" as xml {
+	xpath = "/profile/AreaEstimates/Resources"
+	};
+
+source3 = import from "test/data/assignment2/decision_tree.yaml";
+
+
+source4 = import "params" from "test/data/assignment2/decision_tree.yaml" as yaml;
+
+
+table1 = merge [
+	source1 apply pip1,
+	source2,
+	source3,
+	source4
+];
+
+export table1 to "out/output.html" as html {
+	css = "test/data/css/sober.css"
+};

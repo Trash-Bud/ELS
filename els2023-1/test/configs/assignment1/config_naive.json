@@ -1,0 +1,109 @@
+{
+    "sources": {
+        "report_file_1": {
+            "path": "test/data/assignment1/decision_tree_1.yaml",
+            "query": "params",
+            "store_in_columns": { "path": "File" },
+            "columns": [
+                "File",
+                "criterion",
+                "splitter",
+                "ccp_alpha",
+                "min_samples_split"
+            ],
+            "format": "yaml"
+        },
+        "report_file_2": {
+            "path": "test/data/assignment1/decision_tree_2.yaml",
+            "query": "params",
+            "store_in_columns": { "path": "File" },
+            "columns": [
+                "File",
+                "criterion",
+                "splitter",
+                "ccp_alpha",
+                "min_samples_split"
+            ],
+            "format": "yaml"
+        },
+        "report_file_3": {
+            "path": "test/data/assignment1/decision_tree_3.yaml",
+            "query": "params",
+            "store_in_columns": { "path": "File" },
+            "columns": [
+                "File",
+                "criterion",
+                "splitter",
+                "ccp_alpha",
+                "min_samples_split"
+            ],
+            "format": "yaml"
+        }
+    },
+    "tables": {
+        "table1": {
+            "operation": "transformation",
+            "transformation": {
+                "transformation": "get_name_from_path",
+                "column": "File"
+            },
+            "table": {
+                "operation": "transformation",
+                "transformation": {
+                    "transformation": "rename",
+                    "from": "criterion",
+                    "to": "Criterion"
+                },
+                "table": {
+                    "operation": "transformation",
+                    "transformation": {
+                        "transformation": "rename",
+                        "from": "splitter",
+                        "to": "Splitter"
+                    },
+                    "table": {
+                        "operation": "transformation",
+                        "transformation": {
+                            "transformation": "rename",
+                            "from": "ccp_alpha",
+                            "to": "CPP Alpha"
+                        },
+                        "table": {
+                            "operation": "transformation",
+                            "transformation": {
+                                "transformation": "rename",
+                                "from": "min_samples_split",
+                                "to": "Min Samples Split"
+                            },
+                            "table": {
+                                "operation": "append",
+                                "mode": "union",
+                                "tables": [
+                                    {
+                                        "operation": "selection",
+                                        "source": "report_file_1"
+                                    },
+                                    {
+                                        "operation": "selection",
+                                        "source": "report_file_2"
+                                    },
+                                    {
+                                        "operation": "selection",
+                                        "source": "report_file_3"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "outputs": [
+        {
+            "path": "out/output.csv",
+            "format": "csv",
+            "table": "table1"
+        }
+    ]
+}

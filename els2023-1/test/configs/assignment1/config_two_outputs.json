@@ -1,0 +1,68 @@
+{
+    "sources": {
+        "report_files": {
+            "path": "test/data/assignment1/decision_tree_*.yaml",
+            "query": "params",
+            "store_in_columns": { "path": "File" },
+            "columns": [
+                "File",
+                "criterion",
+                "splitter",
+                "ccp_alpha",
+                "min_samples_split"
+            ],
+            "format": "yaml"
+        }
+    },
+    "pipelines": {
+        "1": [
+            {
+                "transformation": "rename",
+                "from": "criterion",
+                "to": "Criterion"
+            },
+            {
+                "transformation": "rename",
+                "from": "splitter",
+                "to": "Splitter"
+            },
+            {
+                "transformation": "rename",
+                "from": "ccp_alpha",
+                "to": "CPP Alpha"
+            },
+            {
+                "transformation": "rename",
+                "from": "min_samples_split",
+                "to": "Min Samples Split"
+            },
+            {
+                "transformation": "get_name_from_path",
+                "column": "File"
+            }
+        ]
+    },
+    "tables": {
+        "untransformed": {
+            "operation": "selection",
+            "source": "report_files"
+        },
+        "table1": {
+            "operation": "pipeline",
+            "pipeline": "1",
+            "table": "untransformed"
+        }
+    },
+    "outputs": [
+        {
+            "path": "out/output.csv",
+            "format": "csv",
+            "table": "table1"
+        },
+        {
+            "path": "out/output_untransformed.csv",
+            "format": "csv",
+            "table": "untransformed"
+        }
+    ]
+}

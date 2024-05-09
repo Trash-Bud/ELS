@@ -1,0 +1,27 @@
+{
+    "sources": {
+        "decision_tree_1": {
+            "path": "test/data/assignment1/decision_tree_1.yaml",
+            "format": "yaml",
+            "query": "params",
+            "columns": [
+                "criterion",
+                "splitter"
+            ]
+        }
+    },
+    "pipelines": {},
+    "tables": {
+        "table1": {
+            "operation": "selection",
+            "source": "decision_tree_1"
+        }
+    },
+    "outputs": [
+        {
+            "path": "out/output.csv",
+            "format": "csv",
+            "table": "table1"
+        }
+    ]
+}
